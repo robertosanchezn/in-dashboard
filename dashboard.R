@@ -98,7 +98,12 @@ get_profitability <- function() {
   ) |>
     filter(Rentabilidad > 0) |>
     arrange(Rentabilidad) |>
-    select(-Horas)
+    mutate(
+      `Empresa cliente` = `Empresa`,
+      Facturación = glue("{as.character(Facturación)} €"),
+      `* Rentabilidad` = Rentabilidad, 
+      ) |> 
+    select(`Empresa cliente`, Facturación, `* Rentabilidad`)
 }
 
 # Generate data for small clients
@@ -149,17 +154,24 @@ get_strategic_clients <- function() {
 
 # Define UI for the application
 
-body <- dashboardBody(fluidRow(column(
+body <- dashboardBody(
   width = 12,
-  p(
-    "Los datos mostrados en este dashboard han sido generados aleatoriamente. Recarga la página para regenerarlos"
-  )
-)),
+  
+  fluidRow(
+    column(
+      width = 2, 
+      h4(textOutput("date"))
+    ),
+    column(
+      width = 10, 
+      h4("Los datos mostrados en este dashboard han sido generados aleatoriamente. Recarga la página para regenerarlo")
+    )
+  ),
 
 fluidRow(
   column(
     width = 2,
-    h2("Servicios"),
+    h2("Calidad"),
     box(
       width = NULL,
       title = "Laboral",
@@ -184,7 +196,7 @@ fluidRow(
   ),
   column(
     width = 5,
-    h2("Clientes"),
+    h2("Viabilidad"),
     box(
       width = NULL,
       title = "Balance de clientes en el útimo año",
@@ -237,8 +249,9 @@ fluidRow(
       status = "primary",
       collapsible = TRUE,
       title = "Clientes, por rentabilidad",
-      p("Top Clientes ordenados por rentabilidad ascendente este mes"),
-      dataTableOutput("profitability")
+      p("Top clientes ordenados por rentabilidad ascendente este mes"),
+      dataTableOutput("profitability"), 
+      footer = "* Rentabilidad = Facturación del cliente / Horas de trabajo totales"
     )
   )
 ))
@@ -265,6 +278,10 @@ server <- function(input, output) {
   profitability_df <- get_profitability()
   small_clients_df <- get_small_clients(this_month)
   strategic_clients_df <- get_strategic_clients()
+  
+  output$date <- renderText({
+    as.character(date(this_date))
+  })
   
   output$lab_tr <- renderValueBox({
     valueBox(
