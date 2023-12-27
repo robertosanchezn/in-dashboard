@@ -286,7 +286,7 @@ server <- function(input, output) {
   output$lab_tr <- renderValueBox({
     valueBox(
       value = servicios_list[["Laboral"]]["tramites"],
-      subtitle = "Tramites completados dentro de plazo",
+      subtitle = "Trámites completados dentro de plazo",
       color = if (servicios_list[["Laboral"]]["tramites"] == "100%")
         "green"
       else
@@ -297,7 +297,7 @@ server <- function(input, output) {
   output$fis_tr <- renderValueBox({
     valueBox(
       value = servicios_list[["Fiscal"]]["tramites"],
-      subtitle = "Tramites completados dentro de plazo",
+      subtitle = "Trámites completados dentro de plazo",
       color = if (servicios_list[["Fiscal"]]["tramites"] == "100%")
         "green"
       else
